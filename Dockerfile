@@ -19,6 +19,9 @@ RUN CGO_ENABLED=0 go build -o /kubebrainz
 FROM ubuntu:22.04
 USER root:root
 
+# Install ca-certificates package
+RUN apt-get update && apt-get install -y ca-certificates
+
 WORKDIR /
 COPY --from=build /kubebrainz /kubebrainz
 
