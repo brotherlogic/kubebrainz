@@ -28,7 +28,7 @@ func runLoop() {
 		log.Printf("Checking musicbrainz")
 
 		val, err := checkLatest()
-		log.Printf("Returned %v -> %v", val, err)
+		log.Printf("Versioned returned %v -> %v", val, err)
 
 		time.Sleep(time.Hour)
 	}
