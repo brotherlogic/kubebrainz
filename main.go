@@ -9,6 +9,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
 
 func checkLatest() (string, error) {
