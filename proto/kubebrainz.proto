@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package kubebrainz;
+
+option go_package = "github.com/brotherlogic/kubebrainz/proto";
+
+message StatusRequest {
+
+}
+message StatusResponse {
+  string version = 1;
+}
+
+message GetArtistRequest {
+  string artitst = 1;
+  bool allow_suffix_squash = 2;
+}
+message GetArtistResponse {
+  string artist_sort = 1;
+}
+
+service PStoreService {
+  rpc Status(StatusRequest) returns (StatusResponse) {};
+  rpc GetArtist(GetArtistRequest) returns (GetArtistResponse) {};
+}
