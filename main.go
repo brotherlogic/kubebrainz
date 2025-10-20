@@ -79,7 +79,7 @@ func main() {
 
 	gs := grpc.NewServer()
 	pb.RegisterKubeBrainzServiceServer(gs, s)
-	log.Printf("pstore is listening on %v", lis.Addr())
+	log.Printf("kubebrainz is listening on %v", lis.Addr())
 
 	// Setup prometheus export
 	http.Handle("/metrics", promhttp.Handler())
@@ -90,7 +90,7 @@ func main() {
 	go runLoop()
 
 	if err := gs.Serve(lis); err != nil {
-		log.Fatalf("pstore failed to serve: %v", err)
+		log.Fatalf("kubebrainz failed to serve: %v", err)
 	}
 
 }

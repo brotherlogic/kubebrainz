@@ -12,7 +12,7 @@ message GetStatusResponse {
 }
 
 message GetArtistRequest {
-  string artitst = 1;
+  string artist = 1;
   bool allow_suffix_squash = 2;
 }
 message GetArtistResponse {
