@@ -4,10 +4,10 @@ package kubebrainz;
 
 option go_package = "github.com/brotherlogic/kubebrainz/proto";
 
-message StatusRequest {
+message GetStatusRequest {
 
 }
-message StatusResponse {
+message GetStatusResponse {
   string version = 1;
 }
 
@@ -19,7 +19,7 @@ message GetArtistResponse {
   string artist_sort = 1;
 }
 
-service PStoreService {
-  rpc Status(StatusRequest) returns (StatusResponse) {};
+service KubeBrainzService {
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse) {};
   rpc GetArtist(GetArtistRequest) returns (GetArtistResponse) {};
 }
