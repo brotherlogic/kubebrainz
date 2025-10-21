@@ -2,17 +2,56 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"log"
 	"testing"
 
 	pb "github.com/brotherlogic/kubebrainz/proto"
+	"github.com/stapelberg/postgrestest"
 )
 
-func InitTestServer() *Server {
-	return &Server{}
+var pgt *postgrestest.Server
+
+func TestMain(m *testing.M) {
+	var err error
+	pgt, err = postgrestest.Start(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	defer pgt.Cleanup()
+
+	m.Run()
+}
+
+func InitTestServer() (*Server, error) {
+	pgurl, err := pgt.CreateDatabase(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	db, err := sql.Open("postgres", pgurl)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS artist (name TEXT, sort_name TEXT)")
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec("INSERT INTO artist (name, sort_name) VALUES ('The Beatles', 'Beatles, The')")
+	if err != nil {
+		return nil, err
+	}
+
+	s := &Server{db: db}
+	return s, nil
 }
 
 func TestGetAritst(t *testing.T) {
-	s := InitTestServer()
+	s, err := InitTestServer()
+	if err != nil {
+		log.Fatalf("Unable to init test server: %v", err)
+	}
 
 	resp, err := s.GetArtist(context.Background(), &pb.GetArtistRequest{Artist: "The Beatles"})
 	if err != nil {
