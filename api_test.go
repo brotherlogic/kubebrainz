@@ -33,18 +33,15 @@ func InitTestServer() (*Server, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS artist (name TEXT, sort_name TEXT)")
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = db.Exec("INSERT INTO artist (name, sort_name) VALUES ('The Beatles', 'Beatles, The')")
-	if err != nil {
-		return nil, err
-	}
-
 	s := &Server{db: db}
-	return s, nil
+	err = s.initDB()
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.loadFile(context.Background(), "artist", "testdata/artist-test.sql")
+
+	return s, err
 }
 
 func TestGetAritst(t *testing.T) {
