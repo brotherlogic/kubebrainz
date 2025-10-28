@@ -9,13 +9,24 @@ import (
 	pb "github.com/brotherlogic/kubebrainz/proto"
 )
 
-type Server struct {
-}
-
 func (s *Server) GetStatus(ctx context.Context, req *pb.GetStatusRequest) (*pb.GetStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "haven't got to this yet")
 }
 
 func (s *Server) GetArtist(ctx context.Context, req *pb.GetArtistRequest) (*pb.GetArtistResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "haven't got to this yet")
+	rows, err := s.db.Query("SELECT sort_name FROM artist WHERE name = $1",
+		req.GetArtist())
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sortName string
+	for rows.Next() {
+		if err := rows.Scan(&sortName); err == nil {
+			return &pb.GetArtistResponse{ArtistSort: sortName}, nil
+		}
+	}
+
+	return nil, status.Errorf(codes.NotFound, "Could not locate %v in db", req.GetArtist())
 }
