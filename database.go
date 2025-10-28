@@ -1,6 +1,10 @@
 package main
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"os"
+)
 
 const tables = `
 CREATE TABLE artist ( -- replicate (verbose)
@@ -50,6 +54,10 @@ func (s *Server) initDB() error {
 }
 
 func (s *Server) loadFile(ctx context.Context, table string, file string) error {
-	_, err := s.db.ExecContext(ctx, "COPY ? FROM ? (DELIMITER(','))", table, file)
+	path, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	_, err = s.db.ExecContext(ctx, fmt.Sprintf("COPY %v FROM '%v/%v' (DELIMITER('\t'))", table, path, file))
 	return err
 }
