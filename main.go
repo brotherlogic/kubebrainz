@@ -75,7 +75,13 @@ func main() {
 	if err := downloadFile(); err != nil {
 		log.Fatalf("Unable to download file: %v", err)
 	}
-	log.Printf("Downloaded in %v", time.Since(t))
+	fi, err := os.Stat("download.tar.bz2")
+	if err != nil {
+		log.Fatalf("Unable to stat file: %v", err)
+	}
+	// get the size
+	size := fi.Size()
+	log.Printf("Downloaded in %v (%v)", time.Since(t), size)
 
 	s := &Server{}
 
