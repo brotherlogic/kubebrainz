@@ -70,6 +70,13 @@ func (s *Server) runLoop() {
 }
 
 func main() {
+	t := time.Now()
+	// Download on startup
+	if err := downloadFile(); err != nil {
+		log.Fatalf("Unable to download file: %v", err)
+	}
+	log.Printf("Downloaded in %v", time.Since(t))
+
 	s := &Server{}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
