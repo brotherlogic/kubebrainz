@@ -81,9 +81,14 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 			return err
 		}
 
-		targetPath := filepath.Join(outputPath, header.Name)
-
-		// Prevent Zip Slip: ensure the target path is within the outputPath
+		// Clean and validate the extracted file path to prevent Zip Slip (directory traversal)
+		cleanHeaderName := filepath.Clean(header.Name)
+		// Reject absolute paths or traversal outside the target dir
+		if strings.HasPrefix(cleanHeaderName, ".."+string(os.PathSeparator)) || cleanHeaderName == ".." || filepath.IsAbs(header.Name) {
+			fmt.Printf("Skipping potentially unsafe file outside target dir: %s\n", header.Name)
+			continue
+		}
+		targetPath := filepath.Join(outputPath, cleanHeaderName)
 		absOutputPath, err := filepath.Abs(outputPath)
 		if err != nil {
 			fmt.Printf("Error getting absolute output path: %v\n", err)
