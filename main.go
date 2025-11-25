@@ -77,11 +77,22 @@ func main() {
 	}
 	fi, err := os.Stat("download.tar.bz2")
 	if err != nil {
-		log.Fatalf("Unable to stat file: %v", err)
+		log.Fatalf("Unable to stat downloadedfile: %v", err)
 	}
 	// get the size
 	size := fi.Size()
 	log.Printf("Downloaded in %v (%v)", time.Since(t), size)
+
+	if size < 1000 {
+		data, err := os.ReadFile("download.tar.bz2")
+		if err != nil {
+			log.Fatalf("Error reading file: %v", err)
+			return
+		}
+
+		// Convert the byte slice to a string and print it
+		log.Println(string(data))
+	}
 
 	s := &Server{}
 
