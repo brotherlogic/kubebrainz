@@ -41,8 +41,8 @@ func downloadFile() error {
 	}
 	defer out.Close()
 
-	log.Printf("Downloading %v", fmt.Sprintf("%v%v/mdbdump.tar.bz2", BASE, latest))
-	resp, err := http.Get(fmt.Sprintf("%v%v/mdbdump.tar.bz2", BASE, latest))
+	log.Printf("Downloading %v", fmt.Sprintf("%v%v/mbdump.tar.bz2 ", BASE, latest))
+	resp, err := http.Get(fmt.Sprintf("%v%v/mbdump.tar.bz2 ", BASE, latest))
 	if err != nil {
 		return err
 	}
