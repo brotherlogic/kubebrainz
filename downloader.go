@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -40,11 +41,13 @@ func downloadFile() error {
 	}
 	defer out.Close()
 
+	log.Printf("Downloading %v", fmt.Sprintf("%v%v/mdbdump.tar.bz2", BASE, latest))
 	resp, err := http.Get(fmt.Sprintf("%v%v/mdbdump.tar.bz2", BASE, latest))
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 	_, err = io.Copy(out, resp.Body)
+
 	return err
 }
