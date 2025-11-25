@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const (
@@ -24,7 +25,7 @@ func getLatest() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return buf.String(), nil
+	return strings.TrimSpace(buf.String()), nil
 }
 
 func downloadFile() error {
