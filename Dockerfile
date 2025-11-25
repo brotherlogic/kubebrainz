@@ -7,6 +7,9 @@ WORKDIR $GOPATH/src/github.com/brotherlogic/kubebrainz
 COPY go.mod ./
 COPY go.sum ./
 
+RUN mkdir proto
+COPY proto/*.go ./proto/
+
 RUN go mod download
 
 COPY *.go ./
