@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const tables = `
@@ -77,10 +78,26 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 		}
 		if err != nil {
 			fmt.Printf("Error reading tar header: %v\n", err)
-			return
+			return err
 		}
 
 		targetPath := filepath.Join(outputPath, header.Name)
+
+		// Prevent Zip Slip: ensure the target path is within the outputPath
+		absOutputPath, err := filepath.Abs(outputPath)
+		if err != nil {
+			fmt.Printf("Error getting absolute output path: %v\n", err)
+			return err
+		}
+		absTargetPath, err := filepath.Abs(targetPath)
+		if err != nil {
+			fmt.Printf("Error getting absolute target path: %v\n", err)
+			return err
+		}
+		if !strings.HasPrefix(absTargetPath, absOutputPath+string(os.PathSeparator)) && absTargetPath != absOutputPath {
+			fmt.Printf("Skipping potentially unsafe file outside target dir: %s\n", header.Name)
+			continue
+		}
 
 		switch header.Typeflag {
 		case tar.TypeDir:
