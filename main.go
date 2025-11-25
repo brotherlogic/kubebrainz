@@ -40,7 +40,7 @@ func checkLatest() (string, error) {
 
 func checkDBVersion() (string, error) {
 	psqlInfo := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("PG_HOST"),
 		os.Getenv("PG_PORT"),
 		os.Getenv("PG_USER"),
@@ -55,7 +55,7 @@ func checkDBVersion() (string, error) {
 	return "", nil
 }
 
-func runLoop() {
+func (s *Server) runLoop() {
 	for {
 		log.Printf("Checking musicbrainz")
 
@@ -87,7 +87,7 @@ func main() {
 		http.ListenAndServe(fmt.Sprintf(":%v", *metricsPort), nil)
 	}()
 
-	go runLoop()
+	go s.runLoop()
 
 	if err := gs.Serve(lis); err != nil {
 		log.Fatalf("kubebrainz failed to serve: %v", err)
