@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -94,7 +95,27 @@ func main() {
 		log.Println(string(data))
 	}
 
-	s := &Server{}
+	psqlInfo := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("PG_HOST"),
+		os.Getenv("PG_PORT"),
+		os.Getenv("PG_USER"),
+		os.Getenv("PG_PASSWORD"),
+		os.Getenv("PG_DBNAME"))
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatalf("")
+	}
+	defer db.Close()
+
+	s := &Server{
+		db: db,
+	}
+
+	err = s.loadDatabase(context.Background(), "download.tar.bz2")
+	if err != nil {
+		log.Fatalf("Unable to load database: %v", err)
+	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {

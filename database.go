@@ -1,9 +1,13 @@
 package main
 
 import (
+	"archive/tar"
+	"compress/bzip2"
 	"context"
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 )
 
 const tables = `
@@ -44,8 +48,83 @@ CREATE TABLE artist ( -- replicate (verbose)
 );
 `
 
-func (s *Server) runDownload() {
+func (s *Server) unzipFile(archivePath, outputPath string) error {
+	// Create the output directory if it doesn't exist
+	if err := os.MkdirAll(outputPath, 0755); err != nil {
+		fmt.Printf("Error creating output directory: %v\n", err)
+		return
+	}
 
+	// Open the .tar.bz2 file
+	file, err := os.Open(archivePath)
+	if err != nil {
+		fmt.Printf("Error opening archive: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	// Create a bzip2 decompressor
+	bz2Reader := bzip2.NewReader(file)
+
+	// Create a tar reader from the decompressed stream
+	tarReader := tar.NewReader(bz2Reader)
+
+	// Iterate through the files in the tar archive
+	for {
+		header, err := tarReader.Next()
+		if err == io.EOF {
+			break // End of archive
+		}
+		if err != nil {
+			fmt.Printf("Error reading tar header: %v\n", err)
+			return
+		}
+
+		targetPath := filepath.Join(outputPath, header.Name)
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			// Create directory
+			if err := os.MkdirAll(targetPath, os.FileMode(header.Mode)); err != nil {
+				fmt.Printf("Error creating directory %s: %v\n", targetPath, err)
+				return err
+			}
+		case tar.TypeReg:
+			// Create file
+			outFile, err := os.OpenFile(targetPath, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				fmt.Printf("Error creating file %s: %v\n", targetPath, err)
+				return err
+			}
+			defer outFile.Close()
+
+			if _, err := io.Copy(outFile, tarReader); err != nil {
+				fmt.Printf("Error writing file %s: %v\n", targetPath, err)
+				return err
+			}
+		default:
+			fmt.Printf("Skipping unsupported tar entry type: %v for %s\n", header.Typeflag, header.Name)
+		}
+	}
+
+	fmt.Printf("Successfully extracted %s to %s\n", archivePath, outputPath)
+
+	return nil
+}
+
+func (s *Server) loadDatabase(ctx context.Context, file string) error {
+	err := s.initDB()
+	if err != nil {
+		return err
+	}
+
+	//Unzip. the tarball
+	err = s.unzipFile(file, "data_out")
+	if err != nil {
+		return err
+	}
+
+	return s.loadFile(ctx, "artist", "data_out/artist")
 }
 
 func (s *Server) initDB() error {
