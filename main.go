@@ -132,7 +132,7 @@ func main() {
 		http.ListenAndServe(fmt.Sprintf(":%v", *metricsPort), nil)
 	}()
 
-	go s.runLoop()
+	//go s.runLoop()
 
 	if err := gs.Serve(lis); err != nil {
 		log.Fatalf("kubebrainz failed to serve: %v", err)
