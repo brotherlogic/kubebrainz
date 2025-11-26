@@ -132,7 +132,7 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 		}
 	}
 
-	fmt.Printf("Successfully extracted %s to %s\n", archivePath, outputPath)
+	fmt.Printf("successfully extracted %s to %s\n", archivePath, outputPath)
 
 	return nil
 }
