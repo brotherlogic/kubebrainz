@@ -78,7 +78,6 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 	tarReader := tar.NewReader(bz2Reader)
 
 	// Iterate through the files in the tar archive
-Loop:
 	for {
 		header, err := tarReader.Next()
 		if err == io.EOF {
@@ -137,7 +136,12 @@ Loop:
 
 			// We can exit the loop once we've done the arts
 			if strings.HasSuffix(targetPath, "artist") {
-				break Loop
+				err = os.Chmod(targetPath, 0777) // Set 0777 permissions for the file
+				if err != nil {
+					fmt.Printf("Error setting file permissions: %v\n", err)
+					return err
+				}
+				break
 			}
 		default:
 			fmt.Printf("Skipping unsupported tar entry type: %v for %s\n", header.Typeflag, header.Name)
