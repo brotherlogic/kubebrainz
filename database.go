@@ -57,6 +57,12 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 		return err
 	}
 
+	// Also create a subdir to store the data
+	if err := os.MkdirAll(filepath.Join(outputPath, "mbdump"), 0755); err != nil {
+		fmt.Printf("Error creating output directory: %v\n", err)
+		return err
+	}
+
 	// Open the .tar.bz2 file
 	file, err := os.Open(archivePath)
 	if err != nil {
@@ -72,6 +78,7 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 	tarReader := tar.NewReader(bz2Reader)
 
 	// Iterate through the files in the tar archive
+Loop:
 	for {
 		header, err := tarReader.Next()
 		if err == io.EOF {
@@ -126,6 +133,11 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 			if _, err := io.Copy(outFile, tarReader); err != nil {
 				fmt.Printf("Error writing file %s: %v\n", targetPath, err)
 				return err
+			}
+
+			// We can exit the loop once we've done the arts
+			if strings.HasSuffix(targetPath, "artist") {
+				break Loop
 			}
 		default:
 			fmt.Printf("Skipping unsupported tar entry type: %v for %s\n", header.Typeflag, header.Name)
