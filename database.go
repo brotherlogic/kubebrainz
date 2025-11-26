@@ -53,14 +53,14 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 	// Create the output directory if it doesn't exist
 	if err := os.MkdirAll(outputPath, 0755); err != nil {
 		fmt.Printf("Error creating output directory: %v\n", err)
-		return
+		return err
 	}
 
 	// Open the .tar.bz2 file
 	file, err := os.Open(archivePath)
 	if err != nil {
 		fmt.Printf("Error opening archive: %v\n", err)
-		return
+		return err
 	}
 	defer file.Close()
 
