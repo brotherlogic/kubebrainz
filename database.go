@@ -138,13 +138,8 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 }
 
 func (s *Server) loadDatabase(ctx context.Context, file string) error {
-	err := s.initDB()
-	if err != nil {
-		return err
-	}
-
 	//Unzip. the tarball
-	err = s.unzipFile(file, "data_out")
+	err := s.unzipFile(file, "data_out")
 	if err != nil {
 		return err
 	}
