@@ -138,7 +138,7 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 }
 
 func (s *Server) loadDatabase(ctx context.Context, file string) error {
-	//Unzip. the tarball
+	//Unzip the tarball
 	err := s.unzipFile(file, "data_out")
 	if err != nil {
 		return err
