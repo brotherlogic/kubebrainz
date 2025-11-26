@@ -136,7 +136,7 @@ Loop:
 			}
 
 			// We can exit the loop once we've done the arts
-			if strings.HasSuffix(targetPath, "artists") {
+			if strings.HasSuffix(targetPath, "artist") {
 				break Loop
 			}
 		default:
@@ -156,7 +156,7 @@ func (s *Server) loadDatabase(ctx context.Context, file string) error {
 		return err
 	}
 
-	return s.loadFile(ctx, "artists", "data_out/mbdump/artist")
+	return s.loadFile(ctx, "artist", "data_out/mbdump/artist")
 }
 
 func (s *Server) initDB() error {
