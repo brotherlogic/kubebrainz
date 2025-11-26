@@ -89,7 +89,7 @@ func main() {
 	}
 	err = s.initDB()
 	if err != nil {
-		log.Fatalf("Unable to init db: %v", err)
+		log.Fatalf("unable to init db: %v", err)
 	}
 
 	t := time.Now()
