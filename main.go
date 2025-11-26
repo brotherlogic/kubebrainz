@@ -138,6 +138,17 @@ func main() {
 
 	//go s.runLoop()
 
+	go func() {
+		time.Sleep(time.Minute * 5)
+		res, err := s.GetArtist(context.Background(), &pb.GetArtistRequest{
+			Artist: "The Beatles",
+		})
+		if err != nil {
+			log.Fatalf("Unable to get artist: %v", err)
+		}
+		log.Printf("Artist: %v", res)
+	}()
+
 	if err := gs.Serve(lis); err != nil {
 		log.Fatalf("kubebrainz failed to serve: %v", err)
 	}
