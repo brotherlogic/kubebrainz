@@ -78,7 +78,6 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 	tarReader := tar.NewReader(bz2Reader)
 
 	// Iterate through the files in the tar archive
-Loop:
 	for {
 		header, err := tarReader.Next()
 		if err == io.EOF {
