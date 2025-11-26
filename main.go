@@ -71,6 +71,27 @@ func (s *Server) runLoop() {
 }
 
 func main() {
+	psqlInfo := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("PG_HOST"),
+		os.Getenv("PG_PORT"),
+		os.Getenv("PG_USER"),
+		os.Getenv("PG_PASSWORD"),
+		os.Getenv("PG_DBNAME"))
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatalf("")
+	}
+	defer db.Close()
+
+	s := &Server{
+		db: db,
+	}
+	err = s.initDB()
+	if err != nil {
+		log.Fatalf("Unable to init db: %v", err)
+	}
+
 	t := time.Now()
 	// Download on startup
 	if err := downloadFile(); err != nil {
@@ -93,23 +114,6 @@ func main() {
 
 		// Convert the byte slice to a string and print it
 		log.Println(string(data))
-	}
-
-	psqlInfo := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("PG_HOST"),
-		os.Getenv("PG_PORT"),
-		os.Getenv("PG_USER"),
-		os.Getenv("PG_PASSWORD"),
-		os.Getenv("PG_DBNAME"))
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		log.Fatalf("")
-	}
-	defer db.Close()
-
-	s := &Server{
-		db: db,
 	}
 
 	err = s.loadDatabase(context.Background(), "download.tar.bz2")

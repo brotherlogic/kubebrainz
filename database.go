@@ -6,13 +6,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
 const tables = `
-CREATE TABLE artist ( -- replicate (verbose)
+CREATE TABLE IF NOT EXISTS artist ( -- replicate (verbose)
     id                  SERIAL,
     gid                 UUID NOT NULL,
     name                VARCHAR NOT NULL,
@@ -107,12 +108,14 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 		switch header.Typeflag {
 		case tar.TypeDir:
 			// Create directory
+			log.Printf("Creating dir %v", targetPath)
 			if err := os.MkdirAll(targetPath, os.FileMode(header.Mode)); err != nil {
 				fmt.Printf("Error creating directory %s: %v\n", targetPath, err)
 				return err
 			}
 		case tar.TypeReg:
 			// Create file
+			log.Printf("Creating file %v", targetPath)
 			outFile, err := os.OpenFile(targetPath, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
 				fmt.Printf("Error creating file %s: %v\n", targetPath, err)
@@ -135,18 +138,13 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 }
 
 func (s *Server) loadDatabase(ctx context.Context, file string) error {
-	err := s.initDB()
-	if err != nil {
-		return err
-	}
-
 	//Unzip. the tarball
-	err = s.unzipFile(file, "data_out")
+	err := s.unzipFile(file, "data_out")
 	if err != nil {
 		return err
 	}
 
-	return s.loadFile(ctx, "artist", "data_out/artist")
+	return s.loadFile(ctx, "artist", "data_out/mbdump/artist")
 }
 
 func (s *Server) initDB() error {
