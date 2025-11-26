@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -107,12 +108,14 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 		switch header.Typeflag {
 		case tar.TypeDir:
 			// Create directory
+			log.Printf("Creating dir %v", targetPath)
 			if err := os.MkdirAll(targetPath, os.FileMode(header.Mode)); err != nil {
 				fmt.Printf("Error creating directory %s: %v\n", targetPath, err)
 				return err
 			}
 		case tar.TypeReg:
 			// Create file
+			log.Printf("Creating file %v", targetPath)
 			outFile, err := os.OpenFile(targetPath, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
 				fmt.Printf("Error creating file %s: %v\n", targetPath, err)
