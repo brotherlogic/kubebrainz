@@ -95,7 +95,7 @@ func main() {
 	t := time.Now()
 	// Download on startup
 	if err := downloadFile(); err != nil {
-		log.Fatalf("Unable to download file: %v", err)
+		log.Fatalf("unable to download file: %v", err)
 	}
 	fi, err := os.Stat("download.tar.bz2")
 	if err != nil {
