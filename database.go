@@ -13,7 +13,7 @@ import (
 )
 
 const tables = `
-CREATE TABLE IF NOT EXISTSartist ( -- replicate (verbose)
+CREATE TABLE IF NOT EXISTS artist ( -- replicate (verbose)
     id                  SERIAL,
     gid                 UUID NOT NULL,
     name                VARCHAR NOT NULL,
