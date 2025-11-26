@@ -149,7 +149,7 @@ func (s *Server) loadDatabase(ctx context.Context, file string) error {
 		return err
 	}
 
-	return s.loadFile(ctx, "artist", "data_out/artist")
+	return s.loadFile(ctx, "artist", "data_out/mbdump/artist")
 }
 
 func (s *Server) initDB() error {
