@@ -78,6 +78,7 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 	tarReader := tar.NewReader(bz2Reader)
 
 	// Iterate through the files in the tar archive
+Loop:
 	for {
 		header, err := tarReader.Next()
 		if err == io.EOF {
@@ -133,6 +134,11 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 				fmt.Printf("Error writing file %s: %v\n", targetPath, err)
 				return err
 			}
+
+			// We can exit the loop once we've done the arts
+			if strings.HasSuffix(targetPath, "artists") {
+				break Loop
+			}
 		default:
 			fmt.Printf("Skipping unsupported tar entry type: %v for %s\n", header.Typeflag, header.Name)
 		}
@@ -150,7 +156,7 @@ func (s *Server) loadDatabase(ctx context.Context, file string) error {
 		return err
 	}
 
-	return s.loadFile(ctx, "artist", "data_out/mbdump/artist")
+	return s.loadFile(ctx, "artists", "data_out/mbdump/artist")
 }
 
 func (s *Server) initDB() error {
