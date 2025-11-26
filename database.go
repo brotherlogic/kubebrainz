@@ -57,6 +57,12 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 		return err
 	}
 
+	// Also create a subdir to store the data
+	if err := os.MkdirAll(filepath.Join(outputPath, "mbdump"), 0755); err != nil {
+		fmt.Printf("Error creating output directory: %v\n", err)
+		return err
+	}
+
 	// Open the .tar.bz2 file
 	file, err := os.Open(archivePath)
 	if err != nil {
