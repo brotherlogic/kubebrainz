@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/tar"
+	"bufio"
 	"compress/bzip2"
 	"context"
 	"fmt"
@@ -173,6 +174,43 @@ func (s *Server) loadFile(ctx context.Context, table string, file string) error 
 	if err != nil {
 		return err
 	}
-	_, err = s.db.ExecContext(ctx, fmt.Sprintf("COPY %v FROM '%v/%v' (DELIMITER('\t'))", table, path, file))
+
+	f, err := os.Open(fmt.Sprintf("%v/%v", path, file))
+	if err != nil {
+		log.Fatalf("Error opening file: %v", err)
+	}
+	defer f.Close() // Ensure the file is closed when the function exits
+
+	// Create a new scanner for the file
+	scanner := bufio.NewScanner(f)
+
+	// Iterate over each line
+	for scanner.Scan() {
+		line := scanner.Text() // Get the current line as a string
+		elems := strings.Split(line, "\t")
+
+		vals := make([]interface{}, len(elems))
+		for i := range elems {
+			if elems[i] == "\\N" {
+				vals[i] = nil
+			} else {
+				vals[i] = elems[i]
+			}
+		}
+		baseString := fmt.Sprintf("INSERT INTO %v VALUES (", table)
+
+		for i := range elems {
+			baseString += fmt.Sprintf("$%v,", i+1)
+		}
+		baseString = strings.TrimSuffix(baseString, ",")
+		baseString += ")"
+		_, err = s.db.ExecContext(ctx, baseString, vals...)
+		if err != nil {
+			return fmt.Errorf("error inserting %v: %w", elems, err)
+		}
+	}
+
+	// Check for any errors that occurred during scanning
+	err = scanner.Err()
 	return err
 }

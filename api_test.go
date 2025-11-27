@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
 	"testing"
 
 	pb "github.com/brotherlogic/kubebrainz/proto"
+	_ "github.com/lib/pq"
 	"github.com/stapelberg/postgrestest"
 )
 
@@ -74,7 +74,7 @@ func DoubleInitTestServer() (*Server, error) {
 func TestGetAritst(t *testing.T) {
 	s, err := InitTestServer()
 	if err != nil {
-		log.Fatalf("Unable to init test server: %v", err)
+		t.Fatalf("Unable to init test server: %v", err)
 	}
 
 	resp, err := s.GetArtist(context.Background(), &pb.GetArtistRequest{Artist: "The Beatles"})
@@ -89,7 +89,7 @@ func TestGetAritst(t *testing.T) {
 func TestGetAritstWithDouble(t *testing.T) {
 	s, err := DoubleInitTestServer()
 	if err != nil {
-		log.Fatalf("Unable to init test server: %v", err)
+		t.Fatalf("Unable to init test server: %v", err)
 	}
 
 	resp, err := s.GetArtist(context.Background(), &pb.GetArtistRequest{Artist: "The Beatles"})
