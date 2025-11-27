@@ -3,7 +3,8 @@ package main
 import "database/sql"
 
 type Server struct {
-	db *sql.DB
+	db      *sql.DB
+	version string
 }
 
 type ConfiguredServer interface {
