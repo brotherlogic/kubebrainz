@@ -184,8 +184,14 @@ func (s *Server) loadFile(ctx context.Context, table string, file string) error 
 	// Create a new scanner for the file
 	scanner := bufio.NewScanner(f)
 
+	count := 0
 	// Iterate over each line
 	for scanner.Scan() {
+		if count > 1000 {
+			return nil
+		}
+		count++
+
 		line := scanner.Text() // Get the current line as a string
 		elems := strings.Split(line, "\t")
 
