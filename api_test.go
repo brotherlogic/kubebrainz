@@ -44,6 +44,30 @@ func InitTestServer() (*Server, error) {
 	return s, err
 }
 
+func BenchmarkServerInit(b *testing.B) {
+	pgurl, err := pgt.CreateDatabase(context.Background())
+	if err != nil {
+		b.Fatalf("Cannot create db: %v", err)
+	}
+	db, err := sql.Open("postgres", pgurl)
+	if err != nil {
+		b.Fatalf("Cannot open db: %v", err)
+	}
+
+	s := &Server{db: db}
+	err = s.initDB()
+	if err != nil {
+		b.Fatalf("Cannot init db: %v", err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		err = s.loadFile(context.Background(), "artist", "testdata/artist-test.sql")
+		if err != nil {
+			b.Fatalf("Cannot load artist: %v", err)
+		}
+	}
+}
+
 func DoubleInitTestServer() (*Server, error) {
 	pgurl, err := pgt.CreateDatabase(context.Background())
 	if err != nil {
