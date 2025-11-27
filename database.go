@@ -184,18 +184,27 @@ func (s *Server) loadFile(ctx context.Context, table string, file string) error 
 	// Create a new scanner for the file
 	scanner := bufio.NewScanner(f)
 
-	count := 0
+	baseString := ""
+
+	// Start a single transaction
+	tx, err := s.db.BeginTx(ctx, nil)
+
 	// Iterate over each line
 	for scanner.Scan() {
-		if count > 1000 {
-			return nil
-		}
-		count++
-
 		line := scanner.Text() // Get the current line as a string
 		elems := strings.Split(line, "\t")
 
-		vals := make([]interface{}, len(elems))
+		if len(baseString) == 0 {
+			baseString = fmt.Sprintf("INSERT INTO %v VALUES (", table)
+
+			for i := range elems {
+				baseString += fmt.Sprintf("$%v,", i+1)
+			}
+			baseString = strings.TrimSuffix(baseString, ",")
+			baseString += ")"
+		}
+
+		vals := make([]any, len(elems))
 		for i := range elems {
 			if elems[i] == "\\N" {
 				vals[i] = nil
@@ -203,17 +212,16 @@ func (s *Server) loadFile(ctx context.Context, table string, file string) error 
 				vals[i] = elems[i]
 			}
 		}
-		baseString := fmt.Sprintf("INSERT INTO %v VALUES (", table)
 
-		for i := range elems {
-			baseString += fmt.Sprintf("$%v,", i+1)
-		}
-		baseString = strings.TrimSuffix(baseString, ",")
-		baseString += ")"
 		_, err = s.db.ExecContext(ctx, baseString, vals...)
 		if err != nil {
 			return fmt.Errorf("error inserting %v: %w", elems, err)
 		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("error committing transaction: %w", err)
 	}
 
 	// Check for any errors that occurred during scanning
