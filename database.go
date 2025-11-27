@@ -14,8 +14,10 @@ import (
 )
 
 const tables = `
+DROP TABLE IF EXISTS artist;
+
 CREATE TABLE IF NOT EXISTS artist ( -- replicate (verbose)
-    id                  SERIAL,
+    id                  SERIAL PRIMARY KEY,
     gid                 UUID NOT NULL,
     name                VARCHAR NOT NULL,
     sort_name           VARCHAR NOT NULL,
@@ -201,7 +203,7 @@ func (s *Server) loadFile(ctx context.Context, table string, file string) error 
 				baseString += fmt.Sprintf("$%v,", i+1)
 			}
 			baseString = strings.TrimSuffix(baseString, ",")
-			baseString += ")"
+			baseString += ") ON CONFLICT DO NOTHING"
 		}
 
 		vals := make([]any, len(elems))
@@ -223,6 +225,16 @@ func (s *Server) loadFile(ctx context.Context, table string, file string) error 
 	if err != nil {
 		return fmt.Errorf("error committing transaction: %w", err)
 	}
+
+	res, err := s.db.QueryContext(ctx, "SELECT COUNT(*) FROM artist")
+	if err != nil {
+		return fmt.Errorf("error counting artist: %w", err)
+	}
+	res.Next()
+	var count int
+	res.Scan(&count)
+	log.Printf("Loaded %v artists", count)
+	res.Close()
 
 	// Check for any errors that occurred during scanning
 	err = scanner.Err()
