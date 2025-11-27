@@ -92,6 +92,12 @@ func DoubleInitTestServer() (*Server, error) {
 
 	err = s.initDB()
 
+	err = s.loadFile(context.Background(), "artist", "testdata/artist-test.sql")
+
+	if err != nil {
+		return nil, err
+	}
+
 	return s, err
 }
 
