@@ -141,7 +141,7 @@ func (s *Server) unzipFile(archivePath, outputPath string) error {
 					fmt.Printf("Error setting file permissions: %v\n", err)
 					return err
 				}
-				break
+				return nil
 			}
 		default:
 			fmt.Printf("Skipping unsupported tar entry type: %v for %s\n", header.Typeflag, header.Name)
