@@ -10,7 +10,10 @@ import (
 )
 
 func (s *Server) GetStatus(ctx context.Context, req *pb.GetStatusRequest) (*pb.GetStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "haven't got to this yet")
+	// In this version we just serve
+	return &pb.GetStatusResponse{
+		Version: s.version,
+	}, nil
 }
 
 func (s *Server) GetArtist(ctx context.Context, req *pb.GetArtistRequest) (*pb.GetArtistResponse, error) {

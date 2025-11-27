@@ -29,15 +29,15 @@ func getLatest() (string, error) {
 	return strings.TrimSpace(buf.String()), nil
 }
 
-func downloadFile() error {
+func downloadFile() (string, error) {
 	latest, err := getLatest()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	out, err := os.Create("download.tar.bz2")
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer out.Close()
 
@@ -45,10 +45,10 @@ func downloadFile() error {
 	log.Printf("Downloading %v", file)
 	resp, err := http.Get(file)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 	_, err = io.Copy(out, resp.Body)
 
-	return err
+	return latest, err
 }
