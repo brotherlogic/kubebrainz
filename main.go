@@ -116,10 +116,12 @@ func main() {
 		log.Println(string(data))
 	}
 
+	t2 := time.Now()
 	err = s.loadDatabase(context.Background(), "download.tar.bz2")
 	if err != nil {
 		log.Fatalf("Unable to load database: %v", err)
 	}
+	log.Printf("Database loaded in %v", time.Since(t2))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
