@@ -73,7 +73,7 @@ func (s *Server) runLoop() {
 func (s *Server) checkCount(ctx context.Context) int {
 	res, err := s.db.QueryContext(ctx, "SELECT COUNT(*) FROM artist")
 	if err != nil {
-		log.Printf("error counting artist: %w", err)
+		log.Printf("error counting artist: %v", err)
 		return 0
 	}
 	res.Next()
