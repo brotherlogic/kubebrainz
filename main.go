@@ -70,6 +70,18 @@ func (s *Server) runLoop() {
 	}
 }
 
+func (s *Server) checkCount(ctx context.Context) int {
+	res, err := s.db.QueryContext(ctx, "SELECT COUNT(*) FROM artist")
+	if err != nil {
+		log.Printf("error counting artist: %w", err)
+		return 0
+	}
+	res.Next()
+	var count int
+	res.Scan(&count)
+	return count
+}
+
 func main() {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -92,38 +104,42 @@ func main() {
 		log.Fatalf("unable to init db: %v", err)
 	}
 
-	t := time.Now()
-	// Download on startup
-	version, err := downloadFile()
-	if err != nil {
-		log.Fatalf("unable to download file: %v", err)
-	}
-	s.version = version
-	fi, err := os.Stat("download.tar.bz2")
-	if err != nil {
-		log.Fatalf("Unable to stat downloadedfile: %v", err)
-	}
-	// get the size
-	size := fi.Size()
-	log.Printf("Downloaded in %v (%v)", time.Since(t), size)
+	count := s.checkCount(context.Background())
 
-	if size < 1000 {
-		data, err := os.ReadFile("download.tar.bz2")
+	if count == 0 {
+		t := time.Now()
+		// Download on startup
+		version, err := downloadFile()
 		if err != nil {
-			log.Fatalf("Error reading file: %v", err)
-			return
+			log.Fatalf("unable to download file: %v", err)
+		}
+		s.version = version
+		fi, err := os.Stat("download.tar.bz2")
+		if err != nil {
+			log.Fatalf("Unable to stat downloadedfile: %v", err)
+		}
+		// get the size
+		size := fi.Size()
+		log.Printf("Downloaded in %v (%v)", time.Since(t), size)
+
+		if size < 1000 {
+			data, err := os.ReadFile("download.tar.bz2")
+			if err != nil {
+				log.Fatalf("Error reading file: %v", err)
+				return
+			}
+
+			// Convert the byte slice to a string and print it
+			log.Println(string(data))
 		}
 
-		// Convert the byte slice to a string and print it
-		log.Println(string(data))
+		t2 := time.Now()
+		err = s.loadDatabase(context.Background(), "download.tar.bz2")
+		if err != nil {
+			log.Fatalf("Unable to load database: %v", err)
+		}
+		log.Printf("Database loaded in %v", time.Since(t2))
 	}
-
-	t2 := time.Now()
-	err = s.loadDatabase(context.Background(), "download.tar.bz2")
-	if err != nil {
-		log.Fatalf("Unable to load database: %v", err)
-	}
-	log.Printf("Database loaded in %v", time.Since(t2))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
