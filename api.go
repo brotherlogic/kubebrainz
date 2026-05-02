@@ -7,7 +7,24 @@ import (
 	"google.golang.org/grpc/status"
 
 	pb "github.com/brotherlogic/kubebrainz/proto"
+	"log"
 )
+
+func (s *Server) reportFailure(ctx context.Context, artist string) {
+	s.mu.Lock()
+	if s.activeIssues[artist] {
+		s.mu.Unlock()
+		return
+	}
+	s.activeIssues[artist] = true
+	s.mu.Unlock()
+
+	log.Printf("Reporting failure for artist: %v", artist)
+	err := s.githubridge.PostIssue(artist, "Resolution Failure", "Unable to resolve artist "+artist)
+	if err != nil {
+		log.Printf("Error reporting failure: %v", err)
+	}
+}
 
 func (s *Server) GetStatus(ctx context.Context, req *pb.GetStatusRequest) (*pb.GetStatusResponse, error) {
 	// In this version we just serve
@@ -31,5 +48,6 @@ func (s *Server) GetArtist(ctx context.Context, req *pb.GetArtistRequest) (*pb.G
 		}
 	}
 
+	go s.reportFailure(ctx, req.GetArtist())
 	return nil, status.Errorf(codes.NotFound, "Could not locate %v in db", req.GetArtist())
 }
