@@ -12,7 +12,7 @@ gh extension install dlvhdr/gh-dash
 # Auto-start tmux in zsh and bash
 TMUX_BLOCK=$(cat << 'EOF'
 if [ -z "$TMUX" ] && [ -n "$PS1" ]; then
-  /workspaces/kuebbrainz/start-tmux.sh && tmux attach-session -t prod
+  /workspaces/kubebrainz/start-tmux.sh && tmux attach-session -t prod
 fi
 EOF
 )
