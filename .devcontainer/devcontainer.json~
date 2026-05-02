@@ -1,0 +1,49 @@
+{
+	"name": "Ubuntu",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+	"workspaceFolder": "/workspaces/prod",
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"installOhMyZsh": true,
+			"username": "automatic",
+			"userUid": "automatic",
+			"userGid": "automatic",
+			"upgradePackages": true
+		},
+	    "ghcr.io/siri404/devcontainer-ai-features/gemini-cli:1": {},
+	    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+	    		"ghcr.io/devcontainers/features/github-cli:1": {
+			"version": "latest",
+			"installDirectlyFromGitHubRelease": true
+			}
+	},
+	"containerUser": "vscode",
+	"runArgs": [
+		"--security-opt=label=disable"
+	],
+	"updateRemoteUserUID": true,
+	"mounts": [
+        {
+            "source": "${localEnv:HOME}/.ssh",
+            "target": "/home/vscode/.ssh", 
+            "type": "bind",
+            "options": "readonly" 
+        },
+	            {
+            "source": "${localEnv:HOME}/.kube-prod",
+            "target": "/home/vscode/.kube", 
+            "type": "bind"
+		    },
+	    	"source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind"
+    ],
+	"postCreateCommand": "./postCreate.sh",
+	"postStartCommand": "/workspaces/prod/start-tmux.sh",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh"
+			}
+		}
+	}
+}
