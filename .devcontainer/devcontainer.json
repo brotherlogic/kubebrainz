@@ -1,7 +1,7 @@
 {
 	"name": "Kubebbrainz",
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-	"workspaceFolder": "/workspaces/prod",
+	"workspaceFolder": "/workspaces/kubebrainz",
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": true,
@@ -38,7 +38,7 @@
 	    	"source=${localEnv:HOME}/.gemini,target=/home/vscode/.gemini,type=bind"
     ],
 	"postCreateCommand": "./postCreate.sh",
-	"postStartCommand": "/workspaces/prod/start-tmux.sh",
+	"postStartCommand": "/workspaces/kubebrainz/start-tmux.sh",
 	"customizations": {
 		"vscode": {
 			"settings": {
