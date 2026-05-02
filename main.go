@@ -97,7 +97,9 @@ func main() {
 	defer db.Close()
 
 	s := &Server{
-		db: db,
+		db:           db,
+		activeIssues: make(map[string]bool),
+		githubridge:  &GithubridgeClient{},
 	}
 	err = s.initDB()
 	if err != nil {

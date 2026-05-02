@@ -1,10 +1,22 @@
 package main
 
-import "database/sql"
+import (
+	"database/sql"
+	"sync"
+)
 
 type Server struct {
-	db      *sql.DB
-	version string
+	db           *sql.DB
+	version      string
+	activeIssues map[string]bool
+	mu           sync.Mutex
+	githubridge  *GithubridgeClient
+}
+
+type GithubridgeClient struct{}
+
+func (g *GithubridgeClient) PostIssue(artist, title, body string) error {
+    return nil
 }
 
 type ConfiguredServer interface {
