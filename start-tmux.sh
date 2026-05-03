@@ -3,7 +3,7 @@
 # Ensure the 'prod' session exists
 if ! tmux has-session -t prod 2>/dev/null; then
   # Create a new session named 'prod', detached
-  tmux new-session -d -s prod
+  tmux -u new-session -d -s prod
   
   # Split the window horizontally (-h)
   # The left pane will remain a terminal
