@@ -19,6 +19,10 @@
 			}
 	},
 	"containerUser": "vscode",
+	"remoteEnv": {
+		"LANG": "C.UTF-8",
+		"LC_ALL": "C.UTF-8"
+	},
 	"runArgs": [
 		"--security-opt=label=disable"
 	],
