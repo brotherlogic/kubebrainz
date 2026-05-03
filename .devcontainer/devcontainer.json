@@ -1,6 +1,6 @@
 {
 	"name": "Kubebbrainz",
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"workspaceFolder": "/workspaces/kubebrainz",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
