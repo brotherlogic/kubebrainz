@@ -3,6 +3,9 @@
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	"workspaceFolder": "/workspaces/kubebrainz",
 	"features": {
+		"ghcr.io/devcontainers/features/go:1": {
+			"version": "latest"
+		},
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": true,
 			"installOhMyZsh": true,
