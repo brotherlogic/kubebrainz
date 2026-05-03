@@ -4,8 +4,6 @@
 	"workspaceFolder": "/workspaces/kubebrainz",
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
-			"version": "latest",
-			"golangciLintVersion": "none"
 		},
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": true,
